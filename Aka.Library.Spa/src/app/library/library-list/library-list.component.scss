@@ -4,6 +4,10 @@
 }
 
 .example-container {
-  display: inline-flex;
-  flex-direction: row;
+  display: flex;
+  flex-direction: column;
+}
+
+table {
+  width: 100%;
 }

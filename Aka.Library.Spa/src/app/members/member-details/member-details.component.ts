@@ -5,9 +5,11 @@ import { Component, OnInit, HostBinding } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Member } from '../interfaces/member';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap, tap ,map} from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { MemberBook } from '../interfaces/member-book';
+import { SignedOutBook } from '../../shared/signed-out-book';
+import { map as lmap } from 'lodash';
 
 @Component({
   selector: 'app-member-details',
@@ -28,6 +30,8 @@ export class MemberDetailsComponent implements OnInit {
   member$: Observable<Member>;
   bookhistory$: Observable<MemberBook[]>;
   signedout$: Observable<MemberBook[]>;
+  bookhistory:MemberBook[];
+  signedout:MemberBook[];
 
   constructor(
     private route: ActivatedRoute,
@@ -53,8 +57,30 @@ export class MemberDetailsComponent implements OnInit {
           this.firstName = m.fullName.split(' ')[0];
           this.lastName = m.fullName.split(' ')[1];
           this.postalCode = m.postalCode;
-        })
+        }),
+      
       );
+
+      this.bookhistory$=this.route.paramMap.pipe(
+         switchMap((params:ParamMap)=>this.service.getMemberBookHistory(this.auth.currentMember).pipe(map(books=>{
+          return  books.map(book=><MemberBook>{ libraryId:book.libraryBookSid,
+           bookId:book.bookId,
+           memberId:book.memberId,
+           whenReturned:new Date(book.whenReturned),
+           whenSignedOut:new Date(book.whenSignedOut)})
+       }))))
+       this.bookhistory$.subscribe(data=>{this.bookhistory=[...data];console.log(this.bookhistory)});          
+   
+      this.signedout$=this.route.paramMap.pipe(
+         switchMap((params:ParamMap)=>this.service.getSignedOutBooks(this.auth.currentMember).pipe(map(books=>{
+           return  books.map(book=><MemberBook>{ libraryId:book.libraryBookSid,
+            bookId:book.bookId,
+            memberId:book.memberId,
+            whenReturned:new Date(book.whenReturned),
+            whenSignedOut:new Date(book.whenSignedOut)})
+        })))    
+     )
+    this.signedout$.subscribe(data=>this.signedout=[...data]);    
   }
 
   onSubmit() {

@@ -4,11 +4,13 @@ import { Book } from '../shared/book';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SignedOutBook } from '../shared/signed-out-book';
-import { map } from 'lodash';
+import { map as lmap } from 'lodash';
 import { GoogleBooksMetadata } from '../shared/google-books-metadata';
 import { Observable } from 'rxjs/internal/Observable';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { of } from 'rxjs/internal/observable/of';
+import { map } from 'rxjs/operators';
+import { BookListComponent } from '@app/books/book-list/book-list.component';
 
 @Injectable()
 export class BooksService {
@@ -68,7 +70,12 @@ export class BooksService {
    */
   getNumberOfAvailableBookCopies(libraryId: number, bookId: number): Observable<number> {
     // TODO: Add implementation
-    return throwError('Not Implemented');
+    const url = `${this.apiUrl}${libraryId}/books/available`;
+    return  this.http.get<Book[]>(url).pipe(
+      map((Books:Book[]) =>Books.filter(book=>book.bookId==bookId)),
+       map(result=>result.reduce((state, curr) => state + 1, 0))
+      )
+   
   }
 
   checkOutBook(libraryId: number, bookId: number, memberId: number): Observable<SignedOutBook> {
@@ -94,7 +101,7 @@ export class BooksService {
     const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${this.googleBooksAPIKey}`;
 
     // return this.http.get(url);
-    return throwError('Funtion not implemented');
+    return this.http.get<GoogleBooksMetadata>(url);
 
   }
 

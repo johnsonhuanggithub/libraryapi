@@ -18,17 +18,18 @@ export class MemberBookListComponent implements OnInit, AfterViewInit {
 
   currentLibrary: Library;
   displayedColumns = ['bookId', 'title', 'whenSignedOut', 'whenReturned'];
-  dataSource = new MatTableDataSource();
+  dataSource = new MatTableDataSource<MemberBook>();
   selection = new SelectionModel<Element>(true, []);
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  @Input()
+  @Input('memberBooks')
   set memberBooks(value: MemberBook[]){
     this.currentLibrary = null;
-
+    console.log("input:",value);
     this.dataSource.data = value;
+   
   }
 
   constructor() { }
@@ -40,6 +41,7 @@ export class MemberBookListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+   
   }
 
   selectRow(library: Library) {
@@ -53,6 +55,7 @@ export class MemberBookListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+    console.log(this.dataSource.data);
   }
 
 }

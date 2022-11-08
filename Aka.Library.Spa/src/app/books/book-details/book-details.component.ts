@@ -1,5 +1,5 @@
 import { BooksService } from '../../services/books.service';
-import { forkJoin, throwError, Subscription } from 'rxjs';
+import { forkJoin, throwError, Subscription, Observable } from 'rxjs';
 import { map, catchError, tap, take } from 'rxjs/operators';
 import { Book } from '../../shared/book';
 import { Component, OnInit, HostBinding } from '@angular/core';
@@ -105,6 +105,7 @@ export class BookDetailsComponent implements OnInit {
           .pipe(take(1))
           .subscribe((bookMetadata: GoogleBooksMetadata) => {
             this.bookMetadata = bookMetadata;
+            console.log(this.bookMetadata);
           });
       }),
       map(([book, numberOfAvailableCopies, signedOutBooks]) => {
@@ -115,7 +116,7 @@ export class BookDetailsComponent implements OnInit {
       catchError(err => {
         return throwError(err);
       })
-    );
+    ).subscribe(res=>{this.book=res;console.log(res)});
   }
 
 }

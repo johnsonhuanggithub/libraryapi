@@ -27,8 +27,10 @@ export class AuthService {
     return this.http.get<Member>(`${this.apiUrl}/${memberId}`)
       .pipe(
         tap(res => {
+          
           this.isAuthenticated = res !== null;
           this.currentMember = res;
+          this.loggedIn.next(this.isAuthenticated);
         })
       );
   }
